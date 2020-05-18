@@ -2,7 +2,6 @@
 
 using namespace smp;
 
-
 //If the function is called without arguments, all constants are set by default.
 void smp::ParserSettings::InitializeConstants(std::map<char, double>* consts, bool addConstants)
 {
@@ -50,6 +49,7 @@ void smp::ParserSettings::InitializeFunctions(std::map<std::string, double(*)(do
 		Functions["sqrt"] = std::sqrt;
 		Functions["lg"] = std::log10;
 		Functions["ln"] = [](double argument) { return std::log(argument) / std::log(E); };
+		Functions["log"] = Functions["ln"];
 		Functions["abs"] = std::abs;
 	}
 }
@@ -643,6 +643,12 @@ void smp::Multiplication_Oper::updateSubOpers()
 				{
 					if ((value[i] == '*' || value[i] == '/' || isLetter(value[i])) && i < value.size() - 1 && value[i + 1] != '^')
 					{
+						if (isLetter(value[i]))
+						{
+							new_string.push_back(value[i]);
+							i++;
+						}
+
 						new_string.push_back(value[i]);
 						sub_opers.push_back(std::shared_ptr<Oper>(new Power_Oper(new_string, ps)));
 						break;
@@ -726,8 +732,14 @@ void smp::Multiplication_Oper::updateSubOpers()
 					{
 						if ((value[i] == '*' || value[i] == '/' || isLetter(value[i])) && i < value.size() - 1 && value[i + 1] != '^')
 						{
-							new_string.push_back(value[i]);
+							if (isLetter(value[i]))
+							{
+								new_string.push_back(value[i]);
+								i++;
+							}
+							
 							sub_opers.push_back(std::shared_ptr<Oper>(new Power_Oper(new_string, ps)));
+							
 							break;
 						}
 					}
